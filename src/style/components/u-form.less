@@ -1,15 +1,39 @@
 .u-form-title {
   font-weight: bold;
-  padding: 10px 0;
+  padding: 10px;
   font-weight: bold;
   font-size: 16px;
-  border-bottom: 1px solid #ddd;
-  margin: 10px 0;
+  border-bottom: 1px solid #eee;
+  margin: 10px 0 0;
   color: @primary-color;
   display: flex;
   line-height: 24px;
+  -moz-user-select: none; /*火狐*/
+  -webkit-user-select: none; /*webkit浏览器*/
+  -ms-user-select: none; /*IE10*/
+  -khtml-user-select: none; /*早期浏览器*/
+  -webkit-touch-callout: none;
+  user-select: none;
+  background: #fff;
+
+  &.u-form-title-toggle {
+    cursor: pointer;
+  }
   .title-l {
     flex: 1;
+    padding-left: 15px;
+    position: relative;
+    &:before {
+      content: '';
+      display: block;
+      width: 3px;
+      height: 1em;
+      background: @primary-color;
+      position: absolute;
+      left: 0;
+      top: 50%;
+      transform: translateY(-50%);
+    }
     .icon-info {
       font-size: 12px;
       color: #999;
@@ -34,6 +58,20 @@
 .u-form {
   .u-form-item {
     display: inline-flex;
+  }
+  .u-form-btn-box {
+    margin-top: 20px;
+  }
+
+  &.ant-form-inline {
+    .u-form-btn-box {
+      margin-top: 0;
+    }
+  }
+
+  .u-form-box {
+    background: #fff;
+    padding: 10px;
   }
   .ant-form-item-control-wrapper {
     flex: 1;

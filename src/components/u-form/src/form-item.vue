@@ -1,7 +1,9 @@
 <template>
   <a-form-item
     class="u-form-item"
-    v-bind="props">
+    v-bind="props"
+    :name="keyArr"
+    :rules="rules">
     <template v-slot:label>
       <div 
         v-if="item.label" 
@@ -23,113 +25,99 @@
     </div>
     <a-textarea 
       v-else-if="isType('textarea')" 
-      v-bind="item.props"
+      v-bind="itemProps"
       :value="model" 
-      v-on="item.on || {}"
-      @input="inputChange($event)" />
+      @change="inputChange($event)" />
     <a-input-number
       v-else-if="isType('inputNumber')" 
-      v-bind="item.props"
+      v-bind="itemProps"
       :value="model" 
-      v-on="item.on || {}"
       @change="inputChange($event)" />
     <a-date-picker 
       v-else-if="isType('datePicker')" 
-      v-bind="item.props"
-      v-on="item.on || {}"
+      v-bind="itemProps"
       :valueFormat="item.props && item.props.valueFormat ? item.props.valueFormat : 'YYYY-MM-DD'"
       :value="model" 
       @change="dateChange" />
     <a-month-picker 
       v-else-if="isType('monthPicker')" 
-      v-bind="item.props"
-      v-on="item.on || {}"
+      v-bind="itemProps"
       :valueFormat="item.props && item.props.valueFormat ? item.props.valueFormat : 'YYYY-MM'"
       :value="model" 
       @change="dateChange" />
     <a-range-picker 
       v-else-if="isType('rangePicker')" 
-      v-bind="item.props"
-      v-on="item.on || {}"
+      v-bind="itemProps"
       :valueFormat="item.props && item.props.valueFormat ? item.props.valueFormat : 'YYYY-MM-DD'"
       :value="model" 
       @change="dateChange" />
     <a-week-picker 
       v-else-if="isType('weekPicker')" 
-      v-bind="item.props"
-      v-on="item.on || {}"
+      v-bind="itemProps"
       :valueFormat="item.props && item.props.valueFormat ? item.props.valueFormat : 'YYYY-w'"
       :value="model" 
       @change="dateChange" />
     <a-cascader
       v-else-if="isType('cascader')" 
-      v-bind="item.props"
-      v-on="item.on || {}"
+      v-bind="itemProps"
       :value="model" 
       @change="inputChange($event)" 
     />
     <a-checkbox 
       v-else-if="isType('checkbox')"
-      v-bind="item.props"
-      v-on="item.on || {}"
+      v-bind="itemProps"
       :checked="model"
       @change="checkboxChange($event)">
       <uRender v-if="item.text" :render="item.text" :data="modelRef"></uRender>
     </a-checkbox>
     <a-switch 
       v-else-if="isType('switch')"
-      v-bind="item.props"
-      v-on="item.on || {}"
+      v-bind="itemProps"
       :checked="model"
       @change="checkboxChange($event)"/>
     <a-checkbox-group
       v-else-if="isType('checkboxGroup')" 
-      v-bind="item.props"
-      v-on="item.on || {}"
+      v-bind="itemProps"
       :value="model" 
       @change="inputChange($event)"/>
     <a-radio-group
       v-else-if="isType('radioGroup')" 
-      v-bind="item.props"
-      v-on="item.on || {}"
+      v-bind="itemProps"
       :value="model" 
       @change="inputChange($event)"/>
     <a-select
       v-else-if="isType('select')" 
-      v-bind="item.props"
-      v-on="item.on || {}"
+      v-bind="itemProps"
       :value="model" 
       @change="inputChange($event)"/>
-    <u-upload-img 
-      ref="uploadImg" 
-      v-else-if="isType('uploadImg')" 
+    <u-upload 
+      ref="upload" 
+      v-else-if="isType('upload')" 
       :value="model"
-      v-bind="item.props"
-      v-on="item.on || {}"
-      @upload-change="uploadImgChange($event)"/>
+      v-bind="itemProps"
+      @upload-change="uploadChange($event)"/>
     <u-editor 
       :value="model"
-      v-bind="item.props"
-      v-on="item.on || {}"
+      v-bind="itemProps"
       v-else-if="isType('editor')" 
       @change="inputChange($event)"/>
+    <uAsyncSelect v-else-if="isType('asyncSelect')" v-bind="itemProps"/>
     <a-input 
       v-else 
-      v-bind="item.props"
-      v-on="item.on || {}"
+      :disabled="true"
+      v-bind="itemProps"
       :value="model" 
-      @input="inputChange($event)"/>
+      @change="inputChange($event)"/>
   </a-form-item>
 </template>
 <script>
 import { inject, watch } from 'vue'
 import uRender from '@/components/u-render'
-import uUploadImg from '@/components/u-upload-img/src'
-import uEditor from '@/components/u-editor/src'
 import formPopover from './popover'
 import localeUse from '@/use/locale'
-import { isArray, isUndefined, isFunction } from 'lodash'
-
+import modeUse from './use/modeUse'
+import { isArray, isUndefined, isFunction, isObject, isString, isNumber, isEmpty } from 'lodash'
+import { isRequired } from '@/utils'
 export default {
   props: {
     item: Object,
@@ -138,42 +126,109 @@ export default {
   },
   components: {
     uRender,
-    formPopover,
-    uUploadImg,
-    uEditor
+    formPopover
   },
   setup() {
     const modelRef = inject('modelRef')
     const validateInfos = inject('validateInfos')
     const rulesRef = inject('rulesRef')
     const { translate } = localeUse()
+    const {setModel: setModel2, getKeys, getCurModel} = modeUse()
+
     return {
       modelRef,
       validateInfos,
       rulesRef,
-      translate
+      translate,
+      setModel(key, val) {
+        setModel2(modelRef, key, val)
+      },
+      getCurModel(key) {
+        return getCurModel(key, modelRef)
+      },
+      getKeys
     }
   },
   watch: {
-    rulesRef: {
-      handler() {
-        this.uploadImgRulesFn()
-      },
-      immdiate: true
+    model: {
+      handler(val, old) {
+        let { item, modelRef, key, isArrayType } = this
+        
+        if(isArrayType) {
+          let cur = this.getCurModel(key) || []
+          if(this.isformatString(cur)) {
+            cur = cur.split(',')
+          }
+          if(cur + '' !== val + '') {
+            if(this.item.format === 'string') {
+              this.setModel(key, val ? val + '' : val)
+            } else {
+              this.setModel(key, val)
+            }
+            
+            // this.inputChange(val)
+          }
+        }
+
+        if(isFunction(item.onChange)) {
+          item.onChange(modelRef)
+        }
+
+        if(item.relation) {
+          let arr = this.getStrArr(item.relation)
+          this.relationFn(arr, val)
+        }
+      }
     }
   },
   computed: {
+    itemProps() {
+      let {item, translate, isType} = this
+      let props = item.props || {}
+      
+      if(isType(['select', 'cascader'])) {
+        props.placeholder = props.placeholder || translate('uForm.selectPlaceholder')
+      }
+      return {
+        ...props,
+        disabled: isUndefined(props.disabled) ? false : this.disabledFn(props.disabled)
+      }
+    },
     props() {
       let { item, validateInfos } = this
       let props = item ? (item.formItemProps || {}) : {}
       return {
         ...props,
-        ...validateInfos[item.key]
+        //...validateInfos[item.key]
       }
     },
     rules() {
-      let { item, rulesRef, key } = this
-      return key ? (rulesRef[key] || []) : []
+      let { item, rulesRef, key, isType, translate } = this
+
+      let arr = key ? (rulesRef[key] ? [...rulesRef[key]] : []) : []
+
+      if(isType('upload')) {
+        let msg = translate('uUpload.validator.uploading') 
+        arr.push({
+          _type: 'upload',
+          message: msg,
+          trigger: 'change',
+          validator: (rule, value) => {
+            let $upload = this.$refs.upload
+            if($upload) {
+              let isDone = $upload.isDone()
+              if(isDone) {
+                return Promise.resolve()
+              } else {
+                return Promise.reject(msg)
+              }
+            }
+            return Promise.resolve()
+          }
+        })
+      }
+      
+      return arr
     },
     isRequired() {
       let { item, hideRequiredMark, modelRef } = this
@@ -186,7 +241,7 @@ export default {
     rulesFilter() {
       let {rules} = this
       let arr = rules.filter(item => {
-        return item.message
+        return !['upload'].includes(item._type) && item.message
       })
 
       return arr
@@ -194,13 +249,23 @@ export default {
     key() {
       return this.item.key || ''
     },
+    keyArr() {
+      let {key} = this
+      if(key) {
+        let arr = key.split('.')
+        if(arr.length > 1) {
+          return arr
+        }
+      }
+      return key
+    },
     isArrayType() {
       let { item } = this
       let props = item.props || {}
       let mode = props.mode || ''
       let isSelect = (this.isType(['select']) && ['multiple', 'tags'].includes(mode)) 
-      let isUploadImg = (this.isType(['uploadImg']) && (item.props && item.props.limit || Infinity) > 1) 
-      return isUploadImg || isSelect || this.isType(['rangePicker', 'cascader', 'checkboxGroup'])
+      let isUpload = (this.isType(['upload']) && (item.props && item.props.limit || Infinity) > 1) 
+      return isUpload || isSelect || this.isType(['rangePicker', 'cascader', 'checkboxGroup'])
     },
     //当前数据
     model() {
@@ -209,6 +274,7 @@ export default {
       let keys = item.keys
       if(isArrayType) {
         let cur = this.getCurModel(key)
+        
         if(isArray(keys)) {
           let arr = []
           keys.forEach(k => {
@@ -217,12 +283,8 @@ export default {
 
           val = arr[0] ? arr : []
           
-          if(!cur || JSON.stringify(cur) !== JSON.stringify(val)) {
-            this.inputChange(val, key)
-          }
-          
         } else {
-          val = cur || []
+          val = this.isformatString(cur) ? cur.split(',') : (cur || [])
         }
       } else {
         val = this.getCurModel(key)
@@ -231,71 +293,43 @@ export default {
         }
       }
 
-      return val
+      return val === '' ? null : val
     }
   },
   methods: {
-    uploadImgRulesFn() {
-      let {item, key, rulesRef, translate} = this
-      if(key && item.type === 'uploadImg') {
-
-        let msg = translate('uUploadImg.validator.uploading')
-        const uploadImgRules = {
-          _type: 'uploadImg',
-          message: msg,
-          trigger: 'change',
-          validator(rule, value) {
-            let $uploadImg = this.$refs.uploadImg
-            if($uploadImg) {
-              let isDone = $uploadImg.isDone()
-              if(isDone) {
-                return Promise.resolve()
-              } else {
-                return Promise.reject(msg)
-              }
-            }
-          }
-        }
-        if(rulesRef[key]) {
-          if(rulesRef[key].findIndex(v => v._type === 'uploadImg') === -1) {
-            rulesRef[key].push(uploadImgRules)
-          }
-        } else {
-          rulesRef[key] = [uploadImgRules]
-        }
-        console.log(key, rulesRef, '4444')
-      }
+    isformatString(cur) {
+      return (cur && this.item.format === 'string' && isString(cur))
     },
-    getCurModel(key) {
-      let {modelRef} = this
-      let val = ''
-      if(key) {
-        const keyArr = this.getKeys(key)
-        const len = keyArr.length
-        let tempObj = modelRef
-        keyArr.forEach((k, i) => {
-          if(len === (i + 1)) {
-            val = tempObj[k] 
-          } else {
-            tempObj[k] = tempObj[k] || {}
-            tempObj = tempObj[k]
+    isEmpty(value) {
+      return isRequired(value)
+    },
+    relationFn(arr, val) {
+      arr.forEach(({key, type}) => {
+        let keyArr = this.getStrArr(key)
+        if(type === 'required') {
+          if(this.isEmpty(val)) {
+            keyArr.forEach(v => {
+              this.setModel(v, '')
+            })
           }
-        })
-      }
-
+        }
+      })
+    },
+    getStrArr(key) {
+      const val = key ? (isArray(key) ? key : (isString(key) ? key.split(',') : [key])) : []
       return val
+    },
+    disabledFn(disabled){
+      if(isFunction(disabled)) {
+        return disabled(this.modelRef)
+      }
+      return disabled
     },
     isType(type) {
       let arr = isArray(type) ? type : [type]
       return arr.includes(this.item.type)
     },
-    getKeys(key) {
-      let path = key.replace(/\[(\w+)\]/g, '.$1')
-          path = path.replace(/^\./, '')
-      const keyArr = path.split('.')
-      return keyArr
-    },
-    uploadImgChange(val) {
+    uploadChange(val) {
       this.inputChange(val)
     },
     dateChange(Moment) {
@@ -318,13 +352,13 @@ export default {
           if(len === (i + 1)) {
             if(this.isArrayType) {
               let v = (!val || (val && !val.length)) ? (isUndefined(defaultVal) ? [] : defaultVal) : val
-              tempObj[k] = v
-
               if(!k0 && isArray(item.keys)) {
                 item.keys.forEach((k1, index1) => {
-                  this.inputChange(v[index1], k1, '')
+                  this.setModel(k1, v[index1] || '')
+                  // this.inputChange(v[index1], k1, '')
                 })
               }
+              tempObj[k] = item.format === 'string' ? v + '' : v
             } else {
               tempObj[k] = (val || '') + ''
             }

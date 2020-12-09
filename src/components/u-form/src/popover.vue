@@ -4,7 +4,7 @@
         <div class="u-form-tips-content">
           <template v-if="rules && rules.length">
             <div class="tips-title">
-              {{translate('UForm.rule')}}
+              {{translate('uForm.rule')}}
             </div>
             <div v-for="(r, i) in rules" :key="i">
               {{i + 1}}. {{r.message}}
@@ -12,7 +12,7 @@
           </template>
           <template v-if="tips2 && tips2.length">
             <div class="tips-title">
-              {{tipsTile || translate('UForm.tips')}}
+              {{tipsTile || translate('uForm.tips')}}
             </div>
             <div v-for="(r, i) in tips2" :key="i">
               {{i + 1}}. {{r}}

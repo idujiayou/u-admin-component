@@ -1,27 +1,43 @@
 <template>
-  <div class="clearfix">
+  <div class="clearfix" style="line-height: 0">
     <a-upload
+      v-if="listType === 'picture-card'"
       ref="upload"
-      :action="action2"
       list-type="picture-card"
       :file-list="fileList"
       @preview="handlePreview"
-      @change="handleChange"
-      :accept="accept"
       :remove="removeChange"
-      v-bind="$attrs">
-      <div v-if="fileList.length < limit">
+      v-bind="props2">
+      <div v-if="fileList.length < limit && !isShow">
         <plus-outlined />
-        <div class="ant-upload-text">{{ translate('uUploadImg.upload') }}</div>
+        <div class="ant-upload-text">{{ translate('uUpload.upload') }}</div>
       </div>
     </a-upload>
-    <a-modal :visible="previewVisible" :footer="null" @cancel="handleCancel">
+    <a-upload-dragger
+      v-else
+      name="file"
+      ref="upload"
+      :multiple="multiple"
+      :file-list="fileList"
+      :remove="removeChange"
+      v-bind="props2">
+      <template v-if="!isShow">
+        <p class="ant-upload-drag-icon">
+          <inbox-outlined />
+        </p>
+        <p class="ant-upload-text">
+          点击或拖拽到此区域上传
+        </p>
+      </template>
+    </a-upload-dragger>
+    <u-dialog :visible="previewVisible" :footer="null" @cancel="handleCancel">
       <img v-if="previewImage" style="width: 100%" :src="previewImage" />
-    </a-modal>
+    </u-dialog>
   </div>
 </template>
+
 <script>
-import { PlusOutlined } from '@ant-design/icons-vue';
+import { PlusOutlined, InboxOutlined } from '@ant-design/icons-vue';
 import localeUse from '@/use/locale'
 import { inject } from 'vue'
 import { isFunction } from 'lodash'
@@ -35,9 +51,13 @@ function getBase64(file) {
   })
 }
 export default {
-  name: 'uUploadImg',
+  name: 'uUpload',
   props: {
     value: [Array, String],
+    multiple: {
+      type: Boolean,
+      default: false
+    },
     limit: {
       type: Number,
       default: Infinity
@@ -46,14 +66,23 @@ export default {
       type: String,
       default: 'image/*'
     },
-    action: String
+    action: String,
+    listType: {
+      type: String,
+      default: 'picture-card'
+    },
+    mode: {
+      type: String,
+      default: 'edit' // 'show'
+    }
   },
   components: {
     PlusOutlined,
+    InboxOutlined
   },
   setup() {
     const { translate } = localeUse()
-    const { uploadImg: uploadImgConfig} = inject('uConfig')
+    const { upload: uploadImgConfig} = inject('uConfig')
 
     return {
       translate,
@@ -68,8 +97,23 @@ export default {
     }
   },
   computed: {
-    action2() {
-      return this.action || this.uploadImgConfig.action
+    isShow() {
+      return this.mode === 'show'
+    },
+    props2() {
+      let {$attrs, handleChange, isShow} = this
+
+      return {
+        ...$attrs,
+        action: $attrs.action || this.uploadImgConfig.action,
+        disabled: isShow ? true : $attrs.disabled,
+        onChange(evt) {
+          if(isFunction($attrs.onChange)) {
+            $attrs.onChange(evt)
+          }
+          handleChange(evt)
+        }
+      }
     }
   },
   watch: {
@@ -86,17 +130,34 @@ export default {
               let index = fileList.findIndex(v => v.uid === obj.uid)
               return index === -1 && item === this.getUrl(obj)
             })
-
-            if(img) {
-              uid = img.uid
+            if(!img) {
+              let arr = item.split('/')
+              img = {
+                uid,
+                name: arr[arr.length - 1]
+              }
             }
             fileList.push({
-              uid,
+              ...img,
               status: 'done',
               url: item
             })
           })
-          this.fileList = fileList
+ 
+          let flag = false
+          // 是否列表是否已经修改 防止重复修改
+          if(fileList.length === $fileList.length) {
+            $fileList.forEach((item, index) => {
+              if(item.uid !== fileList[index]) {
+                flag = true
+              }
+            })
+          } else {
+            flag = true
+          }
+          if(flag) {
+            this.fileList = fileList
+          }
         }
       }
     }
@@ -109,8 +170,6 @@ export default {
           flag  = false
         }
       })
-
-      console.log(flag, 'uploading')
       return flag
     },
     handleCancel() {

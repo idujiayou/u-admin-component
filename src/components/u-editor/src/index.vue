@@ -8,26 +8,25 @@
       class="quill-editor"
       @input="editorChange">
     </quillEditor>
-    <a-modal
+    <u-dialog
       v-model:visible="visible"
       :width="750"
       :title="translate('uEditor.title')"
       :ok-text="translate('uEditor.confirmButtonText')"
       :cancel-text="translate('uEditor.cancelButtonText')"
       @ok="okFn">
-      <uUploadImg 
+      <uUpload
         ref="uploadImg"
         :value="uploadImg"
         multiple
         @upload-change="uploadChange"/>
-    </a-modal>
+    </u-dialog>
   </div>
 </template>
 <script>
 import localeUse from '@/use/locale'
 import { inject } from 'vue'
 import { quillEditor } from '@/components/vue-quill-editor/src'
-import uUploadImg from '@/components/u-upload-img/src'
 import { message } from 'ant-design-vue'
 import 'quill/dist/quill.core.css'
 import 'quill/dist/quill.snow.css'
@@ -39,12 +38,10 @@ export default {
   },
   components: {
     quillEditor,
-    // eslint-disable-next-line vue/no-unused-components
-    uUploadImg
   },
   setup() {
     const { translate } = localeUse()
-    const { uploadImg: uploadImgConfig} = inject('uConfig')
+    const { upload: uploadImgConfig} = inject('uConfig')
 
     return {
       translate,
@@ -121,7 +118,6 @@ export default {
       }
     },
     editorChange(val) {
-      console.log(val)
       this.$emit('change', val)
     },
     uploadChange(val) {

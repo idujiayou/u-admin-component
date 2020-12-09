@@ -1,0 +1,30 @@
+.u-dialog {
+  max-width: 100%;
+  .u-dialog-title {
+    display: flex;
+  }
+  .u-dialog-title-l {
+    flex: 1;
+  }
+  .u-dialog-title-r {
+    margin-right: 20px;
+    z-index: 100;
+    padding: 0 2px;
+  }
+  .u-dialog-title-icon {
+    color: #999;
+    vertical-align: middle;
+    cursor: pointer;
+  }
+
+  &.u-dialog-full {
+    width: 100% !important;
+    top: 0;
+    padding-bottom: 0;
+
+    .ant-modal-content {
+      min-height: 100vh;
+      border-radius: 0;
+    }
+  }
+}

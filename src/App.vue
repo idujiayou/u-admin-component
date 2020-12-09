@@ -1,5 +1,5 @@
 <template>
-  <a-config-provider :locale="locale">
+  <a-config-provider :locale="locale" :getPopupContainer="getPopupContainer">
     <router-view/>
   </a-config-provider>
 </template>
@@ -14,6 +14,18 @@
 
       return {
         locale: inject('locale')
+      }
+    },
+    methods: {
+      getPopupContainer(el, dialogContext) {
+        if (dialogContext) {
+          return dialogContext.getDialogWrap();
+        } else {
+          if(el && el.classList.contains('ant-menu-submenu-title')) {
+            return el.parentNode 
+          }
+          return document.body;
+        }
       }
     }
   }

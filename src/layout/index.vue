@@ -110,20 +110,28 @@ export default {
   @layoutSiderWidthCollapsed:  80px;
 
   .app-layout {
-    height: 100vh;
-
+    min-height: 100vh;
     .app-layout-sider {
-       overflow: auto;
-       height: 100vh;
        width: 100%;
+       z-index: 1000;
 
        .ant-layout-sider-children {
          display: flex;
-         width: 100%;
+         width: @layoutSiderWidth;
          height: 100%;
          flex-direction: column;
+         position: fixed;
+         left: 0;
+         top: 0;
+         transition: width 0.2s;
        }
-       
+
+      &.ant-layout-sider-collapsed {
+        .ant-layout-sider-children {
+          width: @layoutSiderWidthCollapsed !important;
+        }
+      }
+
        .avatar-wrapper {
          text-align: center;
          color: rgba(250,250,250,0.5);
@@ -139,7 +147,7 @@ export default {
     .app-layout-content {
       padding-top: @layoutHeaderHeight;
       min-height: calc(100vh - @layoutHeaderHeight);
-      background: #fff;
+      background: #f0f2f5;
 
       &.app-layout-content-collapsed {
         .app-layout-header {
@@ -185,11 +193,11 @@ export default {
       box-shadow: 0 1px 4px rgba(0,21,41,0.08);
       transition: all 0.2s;
       padding: 0 20px;
-      z-index: 1000;
+      z-index: 999;
     }
 
     .app-layout-body {
-      margin: 24px 16px 0;
+      margin: 10px 16px 0;
       overflow: initial; 
     }
 
