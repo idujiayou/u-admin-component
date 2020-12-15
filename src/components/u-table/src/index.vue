@@ -44,6 +44,7 @@ export default {
 
       return {
         ...$attrs,
+        rowKey: $attrs.rowKey || 'id',
         pagination: pagination2
       }
     },

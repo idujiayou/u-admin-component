@@ -21,22 +21,21 @@ export default {
   },
   setup(props) {
     const {requestRows: requestRowsFn} = requestUse(props.request)
+    const { table: tableConfig} = inject('uConfig')
     return {
-      ...tableUse(requestRowsFn, props.rowKey)
-    }
-  },
-  data() {
-    return {
-
+      ...tableUse(requestRowsFn, props.rowKey),
+      tableConfig
     }
   },
   computed: {
     props() {
-      let { $attrs, tableData, pagination } = this
+      let { $attrs, tableData, pagination, tableConfig } = this
 
       let columns = $attrs.columns || []
       let obj = {
-        dataSource: $attrs.dataSource 
+        dataSource: $attrs.dataSource,
+        ...tableConfig,
+        rowKey: $attrs.rowKey || tableConfig.rowKey || 'id'
       }
 
       if(this.request) {

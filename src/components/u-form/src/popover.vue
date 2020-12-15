@@ -15,7 +15,7 @@
               {{tipsTile || translate('uForm.tips')}}
             </div>
             <div v-for="(r, i) in tips2" :key="i">
-              {{i + 1}}. {{r}}
+              <uRender :render="r" :data="modelRef" />
             </div>
           </template>
         </div>
@@ -26,12 +26,15 @@
 <script>
 import localeUse from '@/use/locale'
 import { isArray } from 'lodash'
+import uRender from '@/components/u-render'
+import {inject} from 'vue'
 import {
   InfoCircleOutlined
 } from '@ant-design/icons-vue'
 export default {
   components: {
-    InfoCircleOutlined
+    InfoCircleOutlined,
+    uRender
   },
   props: {
     tips: [String, Array],
@@ -40,9 +43,11 @@ export default {
   },
   setup() {
     const { translate } = localeUse()
-    
+    const modelRef = inject('modelRef')
+
     return {
-      translate
+      translate,
+      modelRef
     }
   },
   computed: {

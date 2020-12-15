@@ -78,5 +78,8 @@ export default {
         return response.data.rows
       }
     }
+  },
+  table: {
+    rowKey: 'id'
   }
 }

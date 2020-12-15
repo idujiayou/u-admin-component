@@ -1,5 +1,5 @@
 {
-  "name": "u-admin-master",
+  "name": "u-admin-component",
   "version": "0.1.0",
   "private": true,
   "main": "lib/index.umd.min.js",
