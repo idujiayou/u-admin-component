@@ -93,6 +93,12 @@
           :render="item.render" 
           :data="modelRef"
           v-show="toggleShow(item)"/>
+        <uTableForm 
+          v-else-if="item.type === 'table'"
+          :form-key="item.key"
+          v-bind="item.props"
+          :dataSource="modelRef[item.key] || []"
+          @change="tableChange(item, $event)"/>
         <u-form-item 
           v-else 
           :labelWidth="labelWidth2" 
@@ -126,12 +132,14 @@ import formStyle from './use/formStyle'
 import { provide, inject, toRaw, toRefs, isRef, h } from 'vue'
 import localeUse from '@/use/locale'
 import formPopover from './popover'
+import uTableForm from './table-form'
 import {
   DownOutlined,
   UpOutlined
 } from '@ant-design/icons-vue'
 import requestUse from '@/use/request'
 import { getValueByKey } from '@/utils'
+import modeUse from './use/modeUse'
 
 export default {
   name: 'uForm',
@@ -140,7 +148,8 @@ export default {
     uRender,
     DownOutlined,
     UpOutlined,
-    formPopover
+    formPopover,
+    uTableForm
   },
   props: {
     data: {
@@ -175,6 +184,7 @@ export default {
     loadParams: Object,
     saveParams: Object,
     filterParams: [Function, Array],
+    beforeSubmit: Function,
     // 是否组装带label的参数
     isParamsWithLabel: {
       type: Boolean,
@@ -183,6 +193,14 @@ export default {
     hideBtns: {
       type: Boolean, 
       default: false
+    },
+    successMessage: {
+      type: String,
+      default: '提交成功'
+    },
+    failMessage: {
+      type: String,
+      default: '提交失败'
     }
   },
   setup (props) {
@@ -197,6 +215,7 @@ export default {
       toggleTitle,
       hideItemsArr
     } = toggleUse(formItemsArr.value)
+    const {setModel: setModel2} = modeUse()
 
     const {
       uniKey
@@ -209,7 +228,8 @@ export default {
       validate,
       validateInfos,
       mergeValidateInfo,
-      rulesFn
+      rulesFn,
+      setRules
     } = rulesUse(data.value, validator, locale)
     const {
       isShowFn,
@@ -223,6 +243,8 @@ export default {
     provide('rulesRef', rulesRef)
     provide('mergeValidateInfo', mergeValidateInfo)
     provide('validateInfos',validateInfos)
+    provide('setRules',setRules)
+    
     const {request: requestFn} = requestUse(props.request)
 
     return {
@@ -243,7 +265,10 @@ export default {
       labelWidth2,
       requestFn,
       validateInfos,
-      rulesRef
+      rulesRef,
+      setModel(key, val) {
+        setModel2(modelRef, key, val)
+      }
     }
   },
   mounted() {
@@ -265,6 +290,9 @@ export default {
     }
   },
   methods: {
+    tableChange(item, val) {
+      this.setModel(item.key, val)
+    },
     getParamsWithLabel(arr, modelRef, temp = []) {
       arr.forEach(item => {
         let children = item.type === 'tabs' ? (item.panes || item.children) : item.children
@@ -294,6 +322,9 @@ export default {
       const { submitFn, modelRef, filterParams, saveParams, getParamsWithLabel, formItemsArr, isParamsWithLabel } = this
       this.$refs.form.validate()
         .then(() => {
+          if(typeof this.beforeSubmit === 'function' && !this.beforeSubmit(modelRef)) {
+            return
+          }
           const modelRef2 = toRaw(modelRef)
           let labelParams = []
           if(isParamsWithLabel) {
@@ -319,9 +350,16 @@ export default {
             labelParams)
 
           if(promiseFn.then) {
-            promiseFn.then(ret => {
-              console.log(ret, params)
-            })
+            const fn = () => {
+              promiseFn.then(ret => {
+                this.$message.success(ret.message || this.successMessage)
+                this.$emit('success', ret)
+              }).catch(err => {
+                this.$message.error(err.message || this.failMessage)
+                this.$emit('fail', err)
+              })
+            }
+            
           }
         })
         .catch(err => {

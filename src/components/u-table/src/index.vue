@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="u-table">
     <a-table 
       v-bind="opts"/>
   </div>
@@ -27,9 +27,9 @@ export default {
         showSizeChanger: true,
         itemRender: ({page, type, originalElement}) => {
           return type === 'next' ?  (
-            <div style="display: flex;align-items: center;"> 
+            <div style="position: relative;"> 
               { originalElement } 
-              <div style="padding: 0 5px;" onClick={(evt) => this.refresh(evt)} title={this.translate('uTable.refresh')}>
+              <div class="ant-pagination-item-link ant-pagination-item-refresh" onClick={(evt) => this.refresh(evt)} title={this.translate('uTable.refresh')}>
                 <SyncOutlined />
               </div> 
             </div>

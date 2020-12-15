@@ -2,12 +2,14 @@
   "name": "u-admin-master",
   "version": "0.1.0",
   "private": true,
+  "main": "lib/index.umd.min.js",
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
     "test:unit": "vue-cli-service test:unit",
     "test:e2e": "vue-cli-service test:e2e",
-    "lint": "vue-cli-service lint"
+    "lint": "vue-cli-service lint",
+    "lib": "vue-cli-service build --target lib --name index --dest lib src/index.js"
   },
   "dependencies": {
     "ant-design-vue": "^2.0.0-rc.1",

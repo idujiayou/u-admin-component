@@ -8,6 +8,7 @@ export default function(fn) {
       return fn(query).then(response => {
         return {
           data: ApiConfig.response.getData(response),
+          message: ApiConfig.response.getMessage(response),
           response
         } 
       })
@@ -22,6 +23,7 @@ export default function(fn) {
         return {
           data: ApiConfig.response.getRowsData(response),
           total: ApiConfig.response.getPageTotal(response),
+          message: ApiConfig.response.getMessage(response),
           response
         } 
       })

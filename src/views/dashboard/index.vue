@@ -1,5 +1,5 @@
 <template>
-  <uSearchBtn 
+  <u-search-btn  
     :data="searchlist"
     :btns="btns"/>
   
@@ -9,14 +9,11 @@
     :data="lists"/>
 </template>
 <script>
-import uSearchBtn from '@/components/u-search-btn/src'
 import {
   SearchOutlined
 } from '@ant-design/icons-vue'
-import { Promise } from 'q';
 export default {
   components: {
-    uSearchBtn,
     SearchOutlined
   },
   data() {
@@ -231,6 +228,27 @@ export default {
                 ]
               }
             ]
+          }
+        },
+        {
+          label: 'async-select(单)',
+          key: 'asyncSelect1',
+          type: 'asyncSelect',
+          props: {
+            params: {},
+            multiple: false,
+            mode: 'demo'
+          }
+        },
+        {
+          label: 'async-select',
+          key: 'asyncSelect',
+          selectedKey: 'asyncSelectArr',
+          type: 'asyncSelect',
+          props: {
+            params: {},
+            multiple: true,
+            mode: 'demo'
           }
         }
       ]
@@ -619,14 +637,134 @@ export default {
             {
               label: 'async-select',
               key: 'asyncSelect',
+              selectedKey: 'asyncSelectArr',
               type: 'asyncSelect',
               col: 1,
               props: {
                 params: {},
+                multiple: true,
+                mode: 'demo'
+              }
+            },
+            {
+              label: 'async-select(单)',
+              key: 'asyncSelect1',
+              selectedKey: { id: 'asyncSelect1', name: 'asyncSelect1Name', age: 'asyncSelect1Age'},
+              type: 'asyncSelect',
+              col: 1,
+              props: {
+                params: {},
+                multiple: false,
                 mode: 'demo'
               }
             }
           ]
+        },
+        {
+          label: 'table',
+          type: 'title'
+        },
+        {
+          label: 'table',
+          key: 'table',
+          type: 'table',
+          props: {
+            scroll: { 
+              y: 500 
+            },
+            request(query){
+              console.log(query)
+              let rows = []
+
+              for(let i = 0; i < query.pageSize; i++) {
+                let id = (i + 1) + ((query.page - 1) * query.pageSize)
+                rows.push({
+                  id,
+                  name: 'name' + id,
+                  age: id + 10,
+                  address: 'New York No. 1',
+                  "asyncSelect": [
+                    1,
+                    2
+                  ],
+                  "asyncSelectArr": [
+                    {
+                      "id": 1,
+                      "name": "name1",
+                      "age": 11,
+                      "address": "New York No. 1"
+                    },
+                    {
+                      "id": 2,
+                      "name": "name2",
+                      "age": 12,
+                      "address": "New York No. 1"
+                    }
+                  ]
+                })
+              }
+              return Promise.resolve({
+                data: {
+                  rows: rows,
+                  total: 50
+                }
+              })
+            },
+            columns: [
+              {
+                title: '名称',
+                dataIndex: 'name',
+                form: {
+                  key: 'name',
+                  relation: {
+                    type: 'required',
+                    key: ['asyncSelect', 'address']
+                  },
+                  rules: [ 'required']
+                }
+              },
+              {
+                title: '年龄',
+                dataIndex: 'age',
+                form: {
+                  key: 'asyncSelect',
+                  selectedKey: 'asyncSelectArr',
+                  type: 'asyncSelect',
+                  rules: [ 'required'],
+                  props: {
+                    params: {},
+                    multiple: true,
+                    mode: 'demo'
+                  }
+                }
+              },
+              {
+                title: '地址',
+                dataIndex: 'address',
+                form: {
+                  key: 'address',
+                  rules: [ 'required']
+                }
+              },
+              {
+                type: 'action',
+                actions: [
+                  {
+                    label: '删除',
+                    onClick() {
+                      console.log(1111)
+                    }
+                  },
+                  {
+                    label: '编辑',
+                    onClick() {
+                      console.log(1111)
+                    }
+                  }
+                ]
+              }
+            ]
+          }
         }
       ]
     }
@@ -635,30 +773,53 @@ export default {
     requestFn() {
       return Promise.resolve({
         data: {
-            relation: '',
-            "user": {
-              "password2": "222",
-              "dddd": {
-                "password2": ""
-              },
-              "rangePicker1": "2020-11-12"
+          relation: '',
+          "user": {
+            "password2": "222",
+            "dddd": {
+              "password2": ""
             },
-            "show": "扫毒看来时代峻峰时代峻峰",
-            "password3": "2",
-            "number": "-1",
-            "checkbox": "1",
-            "datePicker": "2020-11-06",
-            "monthPicker": "2020-08",
-            "weekPicker": "2020-11-21",
-            "rangePicker2": "2020-12-16",
-            "province": "jiangsu",
-            "city": "nanjing",
-            "district": "zhonghuamen",
-            uploadImg: [
-              'https://ss0.bdstatic.com/94oJfD_bAAcT8t7mm9GUKT-xh_/timg?image&quality=100&size=b4000_4000&sec=1584979051&di=f6306064ea907879a0e5fa8a6523e27c&src=http://c3.haibao.cn/img/600_0_100_0/1474603002.7212/4436c26958f3b21476deb1dd9fdab812.jpg',
-              'https://ss0.bdstatic.com/94oJfD_bAAcT8t7mm9GUKT-xh_/timg?image&quality=100&size=b4000_4000&sec=1584979051&di=f6306064ea907879a0e5fa8a6523e27c&src=http://c3.haibao.cn/img/600_0_100_0/1474603002.7212/4436c26958f3b21476deb1dd9fdab812.jpg'
-            ]
-          }
+            "rangePicker1": "2020-11-12"
+          },
+          "show": "扫毒看来时代峻峰时代峻峰",
+          "password3": "2",
+          "number": "-1",
+          "checkbox": "1",
+          "datePicker": "2020-11-06",
+          "monthPicker": "2020-08",
+          "weekPicker": "2020-11-21",
+          "rangePicker2": "2020-12-16",
+          "province": "jiangsu",
+          "city": "nanjing",
+          "district": "zhonghuamen",
+          asyncSelect: [1, 2, 3, 5],
+          asyncSelectArr: [
+            {
+              id: 1,
+              name: 'name1'
+            },
+            {
+              id: 2,
+              name: 'name2'
+            },
+            {
+              id: 3,
+              name: 'name3'
+            },
+            {
+              id: 5,
+              name: 'name5'
+            }
+          ],
+          asyncSelect1: 1,
+          asyncSelect1Age: 32,
+          asyncSelect1Name: 'name1',
+          uploadImg: [
+            'https://ss0.bdstatic.com/94oJfD_bAAcT8t7mm9GUKT-xh_/timg?image&quality=100&size=b4000_4000&sec=1584979051&di=f6306064ea907879a0e5fa8a6523e27c&src=http://c3.haibao.cn/img/600_0_100_0/1474603002.7212/4436c26958f3b21476deb1dd9fdab812.jpg',
+            'https://ss0.bdstatic.com/94oJfD_bAAcT8t7mm9GUKT-xh_/timg?image&quality=100&size=b4000_4000&sec=1584979051&di=f6306064ea907879a0e5fa8a6523e27c&src=http://c3.haibao.cn/img/600_0_100_0/1474603002.7212/4436c26958f3b21476deb1dd9fdab812.jpg'
+          ],
+          table: []
+        }
       })
     }
   }

@@ -12,6 +12,12 @@ const routes = [
         component: () => import('@/views/dashboard/index'),
         name: 'Dashboard',
         meta: { title: '首页', icon: 'dashboard', affix: true }
+      },
+      {
+        path: 'lists',
+        component: () => import('@/views/lists/index'),
+        name: 'lists',
+        meta: { title: '列表', icon: 'dashboard', affix: true }
       }
     ]
   }

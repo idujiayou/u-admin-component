@@ -24,44 +24,33 @@ export default {
           let rows = []
 
           for(let i = 0; i < query.pageSize; i++) {
-            let id = (i + 1) * query.page
+            let id = (i + 1) + ((query.page - 1) * query.pageSize)
             rows.push({
               id,
               name: 'name' + id,
-              age: 32,
-              address: 'New York No. 1 Lake Park',
+              age: id + 10,
+              address: 'New York No. 1',
             })
           }
           return Promise.resolve({
             data: {
-              rows: [
-                {
-                  key: '1',
-                  name: 'John Brown',
-                  age: 32,
-                  address: 'New York No. 1 Lake Park',
-                },
-                {
-                  key: '2',
-                  name: 'Jim Green',
-                  age: 42,
-                  address: 'London No. 1 Lake Park',
-                },
-                {
-                  key: '3',
-                  name: 'Joe Black',
-                  age: 32,
-                  address: 'Sidney No. 1 Lake Park',
-                }
-              ],
+              rows: rows,
               total: 50
             }
           })
         },
         columns: [
           {
-            title: 'Name',
+            title: '名称',
             dataIndex: 'name'
+          },
+          {
+            title: '年龄',
+            dataIndex: 'age'
+          },
+          {
+            title: '地址',
+            dataIndex: 'address'
           }
         ]
       }
@@ -69,6 +58,9 @@ export default {
   },
   Api: {
     response: {
+      getMessage(response) {
+        return response.message
+      },
       getData(response) {
         return response.data
       },

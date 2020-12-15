@@ -4,6 +4,7 @@
     v-bind="props"
     :name="keyArr"
     :rules="rules">
+
     <template v-slot:label>
       <div 
         v-if="item.label" 
@@ -101,7 +102,13 @@
       v-bind="itemProps"
       v-else-if="isType('editor')" 
       @change="inputChange($event)"/>
-    <uAsyncSelect v-else-if="isType('asyncSelect')" v-bind="itemProps"/>
+    <uAsyncSelect 
+      v-else-if="isType('asyncSelect')" 
+      :value="model"
+      :selected="uSelected"
+      @change="inputChange($event)"
+      @selected-change="selectedChange"
+      v-bind="itemProps"/>
     <a-input 
       v-else 
       :disabled="true"
@@ -116,9 +123,11 @@ import uRender from '@/components/u-render'
 import formPopover from './popover'
 import localeUse from '@/use/locale'
 import modeUse from './use/modeUse'
-import { isArray, isUndefined, isFunction, isObject, isString, isNumber, isEmpty } from 'lodash'
+import { isArray, isUndefined, isFunction, isObject, isString, isNumber, isEmpty, isPlainObject, forIn } from 'lodash'
 import { isRequired } from '@/utils'
+import { getAsyncSelectKey } from './utils'
 export default {
+  name: 'u-form-item',
   props: {
     item: Object,
     hideRequiredMark: Boolean,
@@ -132,6 +141,7 @@ export default {
     const modelRef = inject('modelRef')
     const validateInfos = inject('validateInfos')
     const rulesRef = inject('rulesRef')
+    const setRules = inject('setRules')
     const { translate } = localeUse()
     const {setModel: setModel2, getKeys, getCurModel} = modeUse()
 
@@ -139,6 +149,7 @@ export default {
       modelRef,
       validateInfos,
       rulesRef,
+      setRules,
       translate,
       setModel(key, val) {
         setModel2(modelRef, key, val)
@@ -165,8 +176,6 @@ export default {
             } else {
               this.setModel(key, val)
             }
-            
-            // this.inputChange(val)
           }
         }
 
@@ -182,6 +191,33 @@ export default {
     }
   },
   computed: {
+    uSelected() {
+      let {isType, item, key, selectedKey, itemProps} = this
+      if(isType('asyncSelect')) {
+        if(isPlainObject(item.selectedKey)) {
+          let obj = {}
+          let flag = true
+          forIn(item.selectedKey, (val, key) => {
+            let val1 = this.getCurModel(val)
+            let rowKey = itemProps.rowKey || 'id'
+
+            if(rowKey === key && isRequired(val1)) {
+              flag = false
+              return false
+            }
+            obj[key] = this.getCurModel(val)
+          })
+
+          return flag ? [obj] : []
+        }
+        return this.getCurModel(selectedKey) || []
+      }
+      return []
+    },
+    selectedKey() {
+      let {item, key} = this
+      return getAsyncSelectKey(item.type, key, item.selectedKey)
+    },
     itemProps() {
       let {item, translate, isType} = this
       let props = item.props || {}
@@ -203,10 +239,17 @@ export default {
       }
     },
     rules() {
-      let { item, rulesRef, key, isType, translate } = this
+      let { item, rulesRef, key, isType, translate, setRules } = this
 
       let arr = key ? (rulesRef[key] ? [...rulesRef[key]] : []) : []
 
+      if(!rulesRef[key] && item.rules) {
+        let arrR = setRules(item.rules)
+        if(arrR && arrR.length) {
+          arr = arrR
+        }
+      }
+      
       if(isType('upload')) {
         let msg = translate('uUpload.validator.uploading') 
         arr.push({
@@ -260,12 +303,13 @@ export default {
       return key
     },
     isArrayType() {
-      let { item } = this
+      let { item, isType } = this
       let props = item.props || {}
       let mode = props.mode || ''
-      let isSelect = (this.isType(['select']) && ['multiple', 'tags'].includes(mode)) 
-      let isUpload = (this.isType(['upload']) && (item.props && item.props.limit || Infinity) > 1) 
-      return isUpload || isSelect || this.isType(['rangePicker', 'cascader', 'checkboxGroup'])
+      let isSelect = (isType(['select']) && ['multiple', 'tags'].includes(mode)) 
+      let isUpload = (isType(['upload']) && (item.props && item.props.limit || Infinity) > 1) 
+      let isAsyncSelect = (isType(['asyncSelect'])) && (item.props && item.props.multiple) 
+      return isAsyncSelect || isUpload || isSelect || isType(['rangePicker', 'cascader', 'checkboxGroup'])
     },
     //当前数据
     model() {
@@ -287,6 +331,7 @@ export default {
           val = this.isformatString(cur) ? cur.split(',') : (cur || [])
         }
       } else {
+        
         val = this.getCurModel(key)
         if(this.isType(['checkbox', 'switch'])) {
           val = val === '1'
@@ -297,6 +342,20 @@ export default {
     }
   },
   methods: {
+    selectedChange(data) {
+      if(this.selectedKey) {
+        let {item} = this
+        if(isPlainObject(item.selectedKey)) {
+          forIn(item.selectedKey, (val, key) => {
+            let val1 = data && data[0] ? (data[0][key] || '') : ''
+            this.setModel(val, val1)
+          })
+          // this.setModel(this.selectedKey, data)
+          return
+        }
+        this.setModel(this.selectedKey, data)
+      }
+    },
     isformatString(cur) {
       return (cur && this.item.format === 'string' && isString(cur))
     },

@@ -5,6 +5,7 @@ import { getLocaleValue } from '@/lang/index'
 import localeUse from '@/use/locale'
 import modeUse from './modeUse'
 import { isRequired } from '@/utils'
+import { getAsyncSelectKey } from '../utils'
 // 设置规则
 const setRules = function(rules, validator, locale, modelRef) {
   let arr = []
@@ -28,7 +29,6 @@ const setRules = function(rules, validator, locale, modelRef) {
         case 'required': {
           obj = {
             validator(rule, value) {
-              console.log(rule, value, isRequired(value))
               if (isRequired(value)) {
                 return Promise.reject(getLocaleValue(locale, 'uValidator.required'))
               } else {
@@ -67,7 +67,7 @@ const setRules = function(rules, validator, locale, modelRef) {
 // 生成规则函数
 const rulesFn = function(data, validator, locale, modelRef, prevObj) {
   let obj = prevObj || {}
-  data.forEach(({key, rules, hide, children}) => {
+  data.forEach(({key, rules, hide, children, type, props}) => {
     let isHide = false
 
     if(isBoolean(hide)) {
@@ -89,21 +89,28 @@ const rulesFn = function(data, validator, locale, modelRef, prevObj) {
 // 生成form表单
 const modelFn = function(data, prevObj, CachKeys) {
   let obj = prevObj || {}
-  data.forEach(({key, dataType, children, type, keys}) => {
+  data.forEach(({key, dataType, children, type, keys, selectedKey}) => {
     if(key && !['title', 'tabs'].includes(type)) {
       let path = key.replace(/\[(\w+)\]/g, '.$1')
           path = path.replace(/^\./, '')
       const keyArr = path.split('.')
       const len = keyArr.length
       let tempObj = obj
+      let isDataTypeArr = type === 'table' || dataType === 'array'
+
       keyArr.forEach((k, i) => {
         if(len === (i + 1)) {
-          tempObj[k] = isArray(dataType) ? [] : ''
+          tempObj[k] = isDataTypeArr ? [] : ''
           if(isArray(keys)) {
             CachKeys.splice.apply(CachKeys, [0, 0, ...keys])
           }
+          let selectedKey2 = getAsyncSelectKey(type, key, selectedKey)
+
+          if(selectedKey2) {
+            CachKeys.push(selectedKey2)
+          }
         } else {
-          tempObj[k] = tempObj[k] || {}
+          tempObj[k] = tempObj[k] ||(isDataTypeArr ? [] : {})
           tempObj = tempObj[k]
         }
       })
@@ -123,7 +130,6 @@ export default function rulesUse(data, validator, locale1, modelRef1) {
   const { locale } = locale1 ? {locale: locale1} : localeUse()
   const {setModel} = modeUse()
   const rulesRef = rulesFn(data, validator, locale, modelRef)
-  console.log(rulesRef)
 
   const { 
     initialModel,
@@ -169,6 +175,9 @@ export default function rulesUse(data, validator, locale1, modelRef1) {
     validate,
     validateField,
     mergeValidateInfo,
-    rulesFn
+    rulesFn,
+    setRules(rules) {
+      return setRules(rules, validator, locale, modelRef)
+    }
   }
 }

@@ -1,13 +1,7 @@
-import { createApp } from 'vue'
-import App from './App.vue'
-import router from './router'
-import store from './store'
-import Antd from 'ant-design-vue'
+
 import uForm from '@/components/u-form'
 import uFormItem from '@/components/u-form/form-item'
 import uDialog from '@/components/u-dialog'
-import { locale, getLanguage, getLocaleValue } from '@/lang/index'
-import 'default-passive-events'
 import uUpload from '@/components/u-upload'
 import uEditor from '@/components/u-editor'
 import uAsyncSelect from '@/components/u-async-select'
@@ -16,12 +10,9 @@ import uSearchBar from '@/components/u-search-bar'
 import uExportBtn from '@/components/u-export-btn'
 import uFormBtn from '@/components/u-form-btn'
 import uTable from '@/components/u-table'
+import '@/style/index.less'
 
-const app = createApp(App)
 const components = [
-  Antd,
-  store,
-  router,
   uUpload, 
   uEditor, 
   uAsyncSelect,
@@ -35,17 +26,28 @@ const components = [
   uTable
 ]
 
-components.forEach(item => {
-  app.use(item)
-})
+const install = function(Vue, opts = {}) {
+  components.forEach(component => {
+    Vue.component(component.name, component);
+  })
+}
 
-app.config.productionTip = false
-app.use({
-  install(app){
-    const curLocale = locale[getLanguage(locale)] || {}
-    app.provide('locale', curLocale)
-    app.config.globalProperties.$t = function(key) {
-      return getLocaleValue(curLocale, key)
-    }
-  }
-}).mount('#app')
+/* istanbul ignore if */
+if (typeof window !== 'undefined' && window.Vue) {
+  install(window.Vue);
+}
+
+export default {
+  install,
+  uUpload, 
+  uEditor, 
+  uAsyncSelect,
+  uForm,
+  uFormItem,
+  uDialog,
+  uSearchBtn,
+  uSearchBar,
+  uExportBtn,
+  uFormBtn,
+  uTable
+};

@@ -1,4 +1,30 @@
 .u-async-select {
   width: 300px;
   max-width: 100%;
+
+  .u-async-select-input {
+    display: inline-flex;
+    width: 100%;
+    border: 1px solid #d9d9d9;
+    border-radius: 4px;
+    align-items: center;
+    padding: 0 5px;
+
+    .ant-input {
+      border: 0;
+      outline: none;
+      box-shadow: none;
+    }
+  }
+  .u-show-tags {
+    line-height: normal;
+  }
+}
+.u-async-select-show-tags {
+  max-width: 500px;
+  
+  .ant-tag {
+    margin-bottom: 5px;
+    margin-top: 5px;
+  }
 }

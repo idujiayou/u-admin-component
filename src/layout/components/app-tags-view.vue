@@ -22,9 +22,9 @@ export default {
           query: {}
         },
         {
-          path: '/2',
-          fullPath: '/2',
-          title: '海外商品',
+          path: '/lists',
+          fullPath: '/lists',
+          title: '列表',
           query: {}
         }
       ]
