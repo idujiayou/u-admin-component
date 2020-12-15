@@ -1,8 +1,8 @@
 {
   "name": "u-admin-component",
-  "version": "0.1.0",
-  "private": true,
+  "version": "1.2.1",
   "main": "lib/index.umd.min.js",
+  "private": false,
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
@@ -10,6 +10,10 @@
     "test:e2e": "vue-cli-service test:e2e",
     "lint": "vue-cli-service lint",
     "lib": "vue-cli-service build --target lib --name index --dest lib src/index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:idujiayou/u-admin-component.git"
   },
   "dependencies": {
     "ant-design-vue": "^2.0.0-rc.1",
