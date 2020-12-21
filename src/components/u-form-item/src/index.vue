@@ -119,13 +119,13 @@
 </template>
 <script>
 import { inject, watch } from 'vue'
-import uRender from '@/components/u-render'
-import formPopover from './popover'
-import localeUse from '@/use/locale'
-import modeUse from './use/modeUse'
+import uRender from 'u-admin-component/src/components/u-render'
+import formPopover from 'u-admin-component/src/components/u-form/src/popover'
+import localeUse from 'u-admin-component/src/use/locale'
 import { isArray, isUndefined, isFunction, isObject, isString, isNumber, isEmpty, isPlainObject, forIn } from 'lodash'
-import { isRequired } from '@/utils'
-import { getAsyncSelectKey } from './utils'
+import { isRequired } from 'u-admin-component/src/utils'
+import { getAsyncSelectKey } from 'u-admin-component/src/components/u-form/src/utils'
+
 export default {
   name: 'u-form-item',
   props: {
@@ -143,7 +143,7 @@ export default {
     const rulesRef = inject('rulesRef')
     const setRules = inject('setRules')
     const { translate } = localeUse()
-    const {setModel: setModel2, getKeys, getCurModel} = modeUse()
+    const {set: setModel, get: getCurModel, getKeys} = inject('modelRefFn')
 
     return {
       modelRef,
@@ -151,12 +151,8 @@ export default {
       rulesRef,
       setRules,
       translate,
-      setModel(key, val) {
-        setModel2(modelRef, key, val)
-      },
-      getCurModel(key) {
-        return getCurModel(key, modelRef)
-      },
+      setModel,
+      getCurModel,
       getKeys
     }
   },

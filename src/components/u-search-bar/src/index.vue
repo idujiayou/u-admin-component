@@ -13,7 +13,7 @@
   </uForm>
 </template>
 <script>
-import localeUse from '@/use/locale'
+import localeUse from 'u-admin-component/src/use/locale'
 export default {
   name: 'uSearchBar',
   props: {

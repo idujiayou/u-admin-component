@@ -1,5 +1,5 @@
 import { isString } from 'lodash'
-import useReactiveRef from '@/use/useReactiveRef'
+import useReactiveRef from 'u-admin-component/src/use/useReactiveRef'
 function toggleShow(item, formItemsArr, hideItemsArr) {
   let index = formItemsArr.findIndex(v => {
     let { toggleKey } = v

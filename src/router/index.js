@@ -1,5 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import Layout from '@/layout'
+import Layout from 'u-admin-component/src/layout'
 
 const routes = [
   {
@@ -9,13 +9,13 @@ const routes = [
     children: [
       {
         path: 'dashboard',
-        component: () => import('@/views/dashboard/index'),
+        component: () => import('u-admin-component/src/views/dashboard/index'),
         name: 'Dashboard',
         meta: { title: '首页', icon: 'dashboard', affix: true }
       },
       {
         path: 'lists',
-        component: () => import('@/views/lists/index'),
+        component: () => import('u-admin-component/src/views/lists/index'),
         name: 'lists',
         meta: { title: '列表', icon: 'dashboard', affix: true }
       }

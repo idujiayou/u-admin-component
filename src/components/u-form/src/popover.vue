@@ -24,9 +24,9 @@
     </a-popover>
 </template>
 <script>
-import localeUse from '@/use/locale'
+import localeUse from 'u-admin-component/src/use/locale'
 import { isArray } from 'lodash'
-import uRender from '@/components/u-render'
+import uRender from 'u-admin-component/src/components/u-render'
 import {inject} from 'vue'
 import {
   InfoCircleOutlined

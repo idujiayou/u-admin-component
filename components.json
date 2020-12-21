@@ -1,0 +1,15 @@
+{
+  "u-form": "./src/components/u-form/index.js",
+  "u-dialog": "./src/components/u-dialog/index.js",
+  "u-form-item": "./src/components/u-form-item/index.js",
+  "u-upload": "./src/components/u-upload/index.js",
+  "u-editor": "./src/components/u-editor/index.js",
+  "u-async-select": "./src/components/u-async-select/index.js",
+  "u-search-btn": "./src/components/u-search-btn/index.js",
+  "u-search-bar": "./src/components/u-search-bar/index.js",
+  "u-form-btn": "./src/components/u-form-btn/index.js",
+  "u-table": "./src/components/u-table/index.js",
+  "u-breadcrumb": "./src/components/u-breadcrumb/index.js",
+  "u-screenfull": "./src/components/u-screenfull/index.js",
+  "u-export-btn": "./src/components/u-export-btn/index.js"
+}

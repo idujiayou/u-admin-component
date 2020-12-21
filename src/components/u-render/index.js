@@ -1,8 +1,8 @@
 import { isFunction } from 'lodash'
 export default  {
   functional: true,
-  render(h) {
+  render() {
     let props = this.$attrs || {}
-    return props.render ? (isFunction(props.render) ? props.render(h, props || {}) : (props.render)) : ('')
+    return props.render ? (isFunction(props.render) ? props.render(props) : (props.render)) : ('')
   }
 }

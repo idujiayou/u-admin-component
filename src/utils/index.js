@@ -11,7 +11,7 @@ export const getKeys = function(key) {
 }
 
 export const getValueByKey = function(key, modelRef) {
-  let val = ''
+  let val = modelRef
   if(key) {
     const keyArr = getKeys(key)
     const len = keyArr.length

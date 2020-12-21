@@ -9,9 +9,9 @@
   </a-button>
 </template>
 <script>
-import localeUse from '@/use/locale'
-import requestUse from '@/use/request'
-import {downloadFile} from '@/utils'
+import localeUse from 'u-admin-component/src/use/locale'
+import requestUse from 'u-admin-component/src/use/request'
+import {downloadFile} from 'u-admin-component/src/utils'
 
 export default {
   name: 'u-export-btn',

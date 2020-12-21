@@ -1,4 +1,4 @@
-import * as validator from '@/utils/validator'
+import * as validator from 'u-admin-component/src/utils/validator'
 export default {
   validator,
   upload: {

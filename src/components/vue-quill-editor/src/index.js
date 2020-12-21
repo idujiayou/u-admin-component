@@ -9,11 +9,11 @@ import _Quill from 'quill'
 import quillEditor from './editor.vue'
 
 const Quill = window.Quill || _Quill
-const install = (Vue, globalOptions) => {
+const install = (app, globalOptions) => {
   if (globalOptions) {
     quillEditor.props.globalOptions.default = () => globalOptions
   }
-  Vue.component(quillEditor.name, quillEditor)
+  app.component(quillEditor.name, quillEditor)
 }
 
 const VueQuillEditor = { Quill, quillEditor, install }

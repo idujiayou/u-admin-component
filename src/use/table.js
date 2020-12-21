@@ -1,16 +1,24 @@
 import {ref } from 'vue'
 import { isFunction, uniqBy } from 'lodash'
 import useReactiveRef from './useReactiveRef'
-export default function(requestRowsFn, rowKey = 'id') {
-  const setPageValue = function(key, val) {
-    pagination.value[key] = val
-  }
+/**
+ * @param requestRowsFn 请求函数
+ * @param opts.rowKey 行唯一id
+ */
+export default function(requestRowsFn, opts = {}) {
+
   let [pageLoading, setLoading] = useReactiveRef(false)
   let [tableData, setTableData] = useReactiveRef([])
   let [pageSearchParams, setPageSearchParams] = useReactiveRef({})
   let [pageParams] = useReactiveRef({})
   let [selectedRowKeys, setSelectedRowKeys] = useReactiveRef([])
   let [selectedRows, setSelectedRows] = useReactiveRef([])
+  opts = {
+    rowKey: 'id', 
+    ...opts
+  }
+
+  const { rowKey, isMerge} = opts
 
   const onSelectChange = function(keys, rows) {
     setSelectedRowKeys(keys)
@@ -34,21 +42,24 @@ export default function(requestRowsFn, rowKey = 'id') {
     setSelectedRows([])
   }
 
-  let pagination = ref({
+  let [pagination, setPageValue] = useReactiveRef({
     total: 0,
     pageSize: 10,
     current: 1,
     onChange: (page) => {
-      setPageValue('current', page)
+      setPageValue(page, 'current')
       loadPage()
     },
     onShowSizeChange: (current, size) => {
-      setPageValue('current', current)
-      setPageValue('pageSize', size)
+      setPageValue(current, 'current')
+      setPageValue(size, 'pageSize')
       loadPage()
     }
   })
 
+  const concatTableData = (data) => {
+    setTableData(data)
+  }
   const loadPage = function() {
     let pageQuery = {
       page: pagination.value.current,
@@ -61,8 +72,8 @@ export default function(requestRowsFn, rowKey = 'id') {
     requestRowsFn({
       ...pageQuery
     }).then(({data, total}) => {
-      setTableData(data)
-      setPageValue('total', total)
+      concatTableData(data)
+      setPageValue(total, 'total')
       setLoading(false)
     }).catch(err => {
       setLoading(false)
@@ -83,9 +94,9 @@ export default function(requestRowsFn, rowKey = 'id') {
   }
   const resetPageParams = function() {
     setTableData([])
-    setPageValue('total', 0)
-    setPageValue('pageSize', 10)
-    setPageValue('current', 1)
+    setPageValue(0, 'total')
+    setPageValue(10, 'pageSize')
+    setPageValue(1, 'current')
   }
 
   return {

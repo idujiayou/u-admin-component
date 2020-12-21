@@ -38,10 +38,10 @@
 
 <script>
 import { PlusOutlined, InboxOutlined } from '@ant-design/icons-vue';
-import localeUse from '@/use/locale'
+import localeUse from 'u-admin-component/src/use/locale'
 import { inject } from 'vue'
 import { isFunction } from 'lodash'
-
+import uConfig from 'u-admin-component/src/config'
 function getBase64(file) {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
@@ -82,7 +82,7 @@ export default {
   },
   setup() {
     const { translate } = localeUse()
-    const { upload: uploadImgConfig} = inject('uConfig')
+    const { upload: uploadImgConfig} = inject('uConfig') || uConfig
 
     return {
       translate,

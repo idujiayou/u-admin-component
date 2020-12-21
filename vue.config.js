@@ -1,4 +1,5 @@
 const path = require("path");
+
 module.exports = {
   devServer: {
     watchOptions: {
@@ -21,5 +22,9 @@ module.exports = {
         path.resolve(__dirname, "src/style/var.less")//需要自行添加
       ]
     }
+  },
+  chainWebpack: (config) => {
+    config.resolve.alias
+      .set('u-admin-component', path.resolve(__dirname, './'))
   }
 }

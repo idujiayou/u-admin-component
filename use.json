@@ -1,0 +1,7 @@
+{
+  "dialog": "./src/use/dialog.js",
+  "locale": "./src/use/locale.js",
+  "request": "./src/use/request.js",
+  "table": "./src/use/table.js",
+  "useReactiveRef": "./src/use/useReactiveRef.js"
+}

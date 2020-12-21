@@ -1,5 +1,7 @@
 <template>
-  <a-config-provider :locale="locale" :getPopupContainer="getPopupContainer">
+  <a-config-provider 
+    :locale="locale" 
+    :getPopupContainer="getPopupContainer">
     <router-view/>
   </a-config-provider>
 </template>
@@ -7,7 +9,7 @@
 <script>
   
   import { provide, inject } from 'vue'
-  import uConfig from '@/config'
+  import uConfig from 'u-admin-component/src/config'
   export default {
     setup() {
       provide('uConfig', uConfig)
@@ -32,5 +34,5 @@
 </script>
 
 <style lang="less">
-  @import '~@/style/index.less';
+  @import '~u-admin-component/src/style/index.less';
 </style>

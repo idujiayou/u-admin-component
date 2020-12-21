@@ -1,10 +1,10 @@
-import { reactive, watch } from 'vue'
+import { reactive, watch, provide } from 'vue'
 import { useForm } from '@ant-design-vue/use'
 import { isString, isArray, isPlainObject, isFunction, isBoolean } from 'lodash'
-import { getLocaleValue } from '@/lang/index'
-import localeUse from '@/use/locale'
+import { getLocaleValue } from 'u-admin-component/src/lang/index'
+import localeUse from 'u-admin-component/src/use/locale'
 import modeUse from './modeUse'
-import { isRequired } from '@/utils'
+import { isRequired } from 'u-admin-component/src/utils'
 import { getAsyncSelectKey } from '../utils'
 // 设置规则
 const setRules = function(rules, validator, locale, modelRef) {
@@ -110,7 +110,7 @@ const modelFn = function(data, prevObj, CachKeys) {
             CachKeys.push(selectedKey2)
           }
         } else {
-          tempObj[k] = tempObj[k] ||(isDataTypeArr ? [] : {})
+          tempObj[k] = tempObj[k] || (isDataTypeArr ? [] : {})
           tempObj = tempObj[k]
         }
       })
@@ -128,7 +128,7 @@ export default function rulesUse(data, validator, locale1, modelRef1) {
   let CachKeys = []
   const modelRef = modelRef1 ? modelRef1 : modelFn(data, null, CachKeys)
   const { locale } = locale1 ? {locale: locale1} : localeUse()
-  const {setModel} = modeUse()
+  const {setModel, getCurModel, getKeys} = modeUse()
   const rulesRef = rulesFn(data, validator, locale, modelRef)
 
   const { 
@@ -160,6 +160,29 @@ export default function rulesUse(data, validator, locale1, modelRef1) {
     //assign(validateInfos, toRaw(obj.validateInfos))
   })
 
+  const setModelRef = (key, val) => {
+    setModel(modelRef, key, val)
+  }
+
+  const getModelRef = (key) => {
+    return getCurModel(key, modelRef)
+  }
+
+  const setRules2 = (rules) => {
+    return setRules(rules, validator, locale, modelRef)
+  }
+
+  provide('modelRef', modelRef)
+  provide('rulesRef', rulesRef)
+  provide('mergeValidateInfo', mergeValidateInfo)
+  provide('validateInfos', validateInfos)
+  provide('setRules', setRules2)
+  provide('modelRefFn', {
+    get: getModelRef,
+    set: setModelRef,
+    getKeys
+  })
+
   return {
     modelRef,
     rulesRef,
@@ -169,15 +192,15 @@ export default function rulesUse(data, validator, locale1, modelRef1) {
       resetFields()
       // 清除额外的参数 一般和数组相连
       CachKeys.forEach( k => {
-        setModel(modelRef, k, '')
+        setModelRef(k, '')
       })
     },
     validate,
     validateField,
     mergeValidateInfo,
     rulesFn,
-    setRules(rules) {
-      return setRules(rules, validator, locale, modelRef)
-    }
+    setRules: setRules2,
+    setModelRef,
+    getModelRef
   }
 }

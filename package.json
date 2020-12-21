@@ -1,7 +1,7 @@
 {
   "name": "u-admin-component",
   "version": "1.2.16",
-  "main": "lib/index.umd.min.js",
+  "main": "lib/u-admin-component.common.js",
   "private": false,
   "scripts": {
     "serve": "vue-cli-service serve",
@@ -9,7 +9,15 @@
     "test:unit": "vue-cli-service test:unit",
     "test:e2e": "vue-cli-service test:e2e",
     "lint": "vue-cli-service lint",
-    "lib": "vue-cli-service build --target lib --name index --dest lib src/index.js"
+    "clean": "rimraf lib",
+    "build:component": "webpack --config build/webpack.component.js",
+    "build:use": "webpack --config build/webpack.use.js",
+    "build:common": "webpack --config build/webpack.component.js",
+    "build:file": "node build/bin/build-entry.js",
+    "build:index": "node build/bin/build-index.js",
+    "build:umd": "vue-cli-service build --target dist --name index --dest dist src/index.js",
+    "deploy": "node ./build/change-version.js && node ./build/deploy.js",
+    "dist": "npm run clean && npm run build:file  && npm run build:index && npm run build:use && npm run build:component && webpack --config build/webpack.common.js"
   },
   "repository": {
     "type": "git",
@@ -20,7 +28,6 @@
     "core-js": "^3.6.5",
     "default-passive-events": "^2.0.0",
     "screenfull": "^5.0.2",
-    "vue": "^3.0.0",
     "vue-router": "^4.0.0-0",
     "vuex": "^4.0.0-0"
   },
@@ -38,9 +45,22 @@
     "chai": "^4.1.2",
     "eslint": "^6.7.2",
     "eslint-plugin-vue": "^7.0.0-0",
+    "json-templater": "^1.2.0",
     "less": "^3.0.4",
     "less-loader": "^5.0.0",
+    "progress-bar-webpack-plugin": "^2.1.0",
+    "rimraf": "^3.0.2",
+    "style-loader": "^2.0.0",
     "stylus-resources-loader": "0.0.4",
-    "vue-quill-editor": "^3.0.6"
+    "uppercamelcase": "^3.0.0",
+    "vue-loader": "^16.1.1",
+    "vue-loader-v16": "^16.0.0-beta.5.4",
+    "vue-quill-editor": "^3.0.6",
+    "webpack-cli": "^4.2.0",
+    "webpack-node-externals": "^2.5.2"
+  },
+  "peerDependencies": {
+    "@vue/compiler-sfc": ">=3.0.4",
+    "vue": ">=3.0.4"
   }
 }

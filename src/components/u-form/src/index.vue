@@ -98,7 +98,7 @@
           :form-key="item.key"
           v-bind="item.props"
           :dataSource="modelRef[item.key] || []"
-          @change="tableChange(item, $event)"/>
+          @data-change="tableChange(item, $event)"/>
         <u-form-item 
           v-else 
           :labelWidth="labelWidth2" 
@@ -121,8 +121,7 @@
   </a-form>
 </template>
 <script>
-import uFormItem from './form-item'
-import uRender from '@/components/u-render'
+import uRender from 'u-admin-component/src/components/u-render'
 import { merge, forIn, isFunction, isArray } from 'lodash'
 import rulesUse from './use/rulesUse'
 import toggleUse from './use/toggleUse'
@@ -130,21 +129,19 @@ import uniKeyUse from './use/uniKeyUse'
 import formUse from './use/formUse'
 import formStyle from './use/formStyle'
 import { provide, inject, toRaw, toRefs, isRef, h } from 'vue'
-import localeUse from '@/use/locale'
+import localeUse from 'u-admin-component/src/use/locale'
 import formPopover from './popover'
 import uTableForm from './table-form'
 import {
   DownOutlined,
   UpOutlined
 } from '@ant-design/icons-vue'
-import requestUse from '@/use/request'
-import { getValueByKey } from '@/utils'
-import modeUse from './use/modeUse'
+import requestUse from 'u-admin-component/src/use/request'
+import uConfig from 'u-admin-component/src/config'
 
 export default {
   name: 'uForm',
   components: {
-    uFormItem,
     uRender,
     DownOutlined,
     UpOutlined,
@@ -195,27 +192,25 @@ export default {
       default: false
     },
     successMessage: {
-      type: String,
-      default: '提交成功'
+      type: String
     },
     failMessage: {
-      type: String,
-      default: '提交失败'
+      type: String
     }
   },
   setup (props) {
-    const { validator = {} } = inject('uConfig')
+    const { validator = {} } = inject('uConfig') || uConfig
     const { translate, locale } = localeUse()
     const propsRef = toRefs(props)
     const { data = [] } = propsRef
     const { formItemsArr } = formUse(data.value)
+
     const {
       toggleShow,
       showToggleFlag,
       toggleTitle,
       hideItemsArr
     } = toggleUse(formItemsArr.value)
-    const {setModel: setModel2} = modeUse()
 
     const {
       uniKey
@@ -229,8 +224,11 @@ export default {
       validateInfos,
       mergeValidateInfo,
       rulesFn,
-      setRules
+      setRules,
+      setModelRef,
+      getModelRef
     } = rulesUse(data.value, validator, locale)
+
     const {
       isShowFn,
       colWidth,
@@ -238,12 +236,6 @@ export default {
       formItemStyle,
       labelWidth2
     } = formStyle(modelRef, propsRef)
-
-    provide('modelRef', modelRef)
-    provide('rulesRef', rulesRef)
-    provide('mergeValidateInfo', mergeValidateInfo)
-    provide('validateInfos',validateInfos)
-    provide('setRules',setRules)
     
     const {request: requestFn} = requestUse(props.request)
 
@@ -266,9 +258,8 @@ export default {
       requestFn,
       validateInfos,
       rulesRef,
-      setModel(key, val) {
-        setModel2(modelRef, key, val)
-      }
+      setModelRef,
+      getModelRef
     }
   },
   mounted() {
@@ -291,18 +282,22 @@ export default {
   },
   methods: {
     tableChange(item, val) {
-      this.setModel(item.key, val)
+      this.setModelRef(item.key, val)
     },
     getParamsWithLabel(arr, modelRef, temp = []) {
       arr.forEach(item => {
         let children = item.type === 'tabs' ? (item.panes || item.children) : item.children
+
         if(children && children.length) {
           this.getParamsWithLabel(children, modelRef, temp)
+
         } else if(!['tabs', 'title'].includes(item.type) && item.key && item.label) {
-          let value = getValueByKey(item.key, modelRef)
+          let value = this.getModelRef(item.key, modelRef)
+
           if(['select'].includes(item.type)) {
             let props = item.props
             let options = props.options || []
+
             options.forEach(v => {
               if(value + '' === v.value + '') {
                 value = v.label
@@ -352,10 +347,10 @@ export default {
           if(promiseFn.then) {
             const fn = () => {
               promiseFn.then(ret => {
-                this.$message.success(ret.message || this.successMessage)
+                this.$message.success(ret.message || this.successMessage || this.translate('uForm.successMessage'))
                 this.$emit('success', ret)
               }).catch(err => {
-                this.$message.error(err.message || this.failMessage)
+                this.$message.error(err.message || this.failMessage || this.translate('uForm.failMessage'))
                 this.$emit('fail', err)
               })
             }

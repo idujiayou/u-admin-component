@@ -5,6 +5,7 @@
     style="margin-bottom: 10px;"
     @search="onPageSearch">
   </u-search-btn>
+
   <u-table 
     :loading="pageLoading"
     rowKey='id'
@@ -18,11 +19,11 @@
     @refresh="loadPage"
     :pagination="pagination">
   </u-table>
-
+  
 </template>
 <script>
-import requestUse from '@/use/request'
-import tableUse from '@/use/table'
+import requestUse from 'u-admin-component/src/use/request'
+import tableUse from 'u-admin-component/src/use/table'
 import {
   SearchOutlined
 } from '@ant-design/icons-vue'
@@ -173,7 +174,7 @@ export default {
                       label: 'rangePicker',
                       key: '_rangePicker',
                       type: 'show',
-                      renderFormItem(h, {data}) {
+                      renderFormItem({data={user:{}}}) {
                         return data.user.rangePicker1 + ' - ' + data.rangePicker2
                       }
                     },
@@ -201,7 +202,7 @@ export default {
                       label: 'rangePicker',
                       key: '_rangePicker',
                       type: 'show',
-                      renderFormItem(h, {data}) {
+                      renderFormItem({data={user:{}}}) {
                         return data.user.rangePicker1 + ' - ' + data.rangePicker2
                       }
                     },

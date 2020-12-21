@@ -1,7 +1,8 @@
 import { inject } from 'vue'
 import { isFunction } from 'lodash'
+import uConfig from 'u-admin-component/src/config'
 export default function(fn) {
-  const { Api: ApiConfig} = inject('uConfig')
+  const { Api: ApiConfig} = inject('uConfig') || uConfig
 
   const request = function(query) {
     if(isFunction(fn)) {

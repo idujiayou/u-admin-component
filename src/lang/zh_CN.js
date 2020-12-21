@@ -6,7 +6,9 @@ export default {
     tips: '提示',
     open: '展开',
     close: '收起',
-    selectPlaceholder: '请选择'
+    selectPlaceholder: '请选择',
+    successMessage: '提交成功',
+    failMessage: '提交失败'
   },
   uUpload: {
     upload: '上传',

@@ -6,7 +6,8 @@
   <u-form
     :col="2"
     :request="requestFn"
-    :data="lists"/>
+    :data="lists"
+    :dddd="555"/>
 </template>
 <script>
 import {
@@ -98,7 +99,7 @@ export default {
                       label: 'rangePicker',
                       key: '_rangePicker',
                       type: 'show',
-                      renderFormItem(h, {data}) {
+                      renderFormItem({data = {user:{}}}) {
                         return data.user.rangePicker1 + ' - ' + data.rangePicker2
                       }
                     },
@@ -126,7 +127,7 @@ export default {
                       label: 'rangePicker',
                       key: '_rangePicker',
                       type: 'show',
-                      renderFormItem(h, {data}) {
+                      renderFormItem({data = {user:{}}}) {
                         return data.user.rangePicker1 + ' - ' + data.rangePicker2
                       }
                     },
@@ -283,7 +284,7 @@ export default {
                 return data.password3 ? [ 'required', 'isPassword'] : []
               },
               tips: [
-                (h, {data}) => {
+                ({data}) => {
                   console.log(data)
                   const columns = [
                     {
@@ -391,12 +392,12 @@ export default {
               type: 'show'
             },
             {
-              label: (h, {data}) => {
+              label: ({data={}}) => {
                 return !data.password3 ? '修改label' : '修改label2'
               },
               key: 'password3',
               rules: [ 'required', 'isPassword'],
-              renderFormItem: (h, {data}) => {
+              renderFormItem: ({data={}}) => {
                 return (
                   <a-input value={data['password3']} onInput={(e) => { data['password3'] = e.target.value;}}/>
                 )
@@ -414,7 +415,7 @@ export default {
           label: '日历',
           tips: ['555', '刚555进公司第六届开发'],
           tipsTile: '自定义提示标题',
-          subTitle: (h, {data}) => {
+          subTitle: ({data}) => {
             return '（我是个子标题）'
           },
           type: 'title',
@@ -735,110 +736,113 @@ export default {
         },
         {
           label: 'table',
-          type: 'title'
-        },
-        {
-          label: 'table',
-          key: 'table',
-          type: 'table',
-          props: {
-            scroll: { 
-              y: 500 
-            },
-            request(query){
-              console.log(query)
-              let rows = []
+          type: 'title',
+          children: [
+            {
+              label: 'table',
+              key: 'table',
+              type: 'table',
+              props: {
+                scroll: { 
+                  y: 500 
+                },
+                request(query){
+                  console.log(query)
+                  let rows = []
 
-              for(let i = 0; i < query.pageSize; i++) {
-                let id = (i + 1) + ((query.page - 1) * query.pageSize)
-                rows.push({
-                  id,
-                  name: 'name' + id,
-                  age: id + 10,
-                  address: 'New York No. 1',
-                  "asyncSelect": [
-                    1,
-                    2
-                  ],
-                  "asyncSelectArr": [
-                    {
-                      "id": 1,
-                      "name": "name1",
-                      "age": 11,
-                      "address": "New York No. 1"
-                    },
-                    {
-                      "id": 2,
-                      "name": "name2",
-                      "age": 12,
-                      "address": "New York No. 1"
-                    }
-                  ]
-                })
-              }
-              return Promise.resolve({
-                data: {
-                  rows: rows,
-                  total: 50
-                }
-              })
-            },
-            columns: [
-              {
-                title: '名称',
-                dataIndex: 'name',
-                form: {
-                  key: 'name',
-                  relation: {
-                    type: 'required',
-                    key: ['asyncSelect', 'address']
-                  },
-                  rules: [ 'required']
-                }
-              },
-              {
-                title: '年龄',
-                dataIndex: 'age',
-                form: {
-                  key: 'asyncSelect',
-                  selectedKey: 'asyncSelectArr',
-                  type: 'asyncSelect',
-                  rules: [ 'required'],
-                  props: {
-                    params: {},
-                    multiple: true,
-                    mode: 'demo'
+                  for(let i = 0; i < query.pageSize; i++) {
+                    let id = (i + 1) + ((query.page - 1) * query.pageSize)
+                    rows.push({
+                      id,
+                      name: 'name' + id,
+                      age: id + 10,
+                      address: 'New York No. 1',
+                      "asyncSelect": [
+                        1,
+                        2
+                      ],
+                      "asyncSelectArr": [
+                        {
+                          "id": 1,
+                          "name": "name1",
+                          "age": 11,
+                          "address": "New York No. 1"
+                        },
+                        {
+                          "id": 2,
+                          "name": "name2",
+                          "age": 12,
+                          "address": "New York No. 1"
+                        }
+                      ]
+                    })
                   }
-                }
-              },
-              {
-                title: '地址',
-                dataIndex: 'address',
-                form: {
-                  key: 'address',
-                  rules: [ 'required']
-                }
-              },
-              {
-                type: 'action',
-                actions: [
+                  return Promise.resolve({
+                    data: {
+                      rows: rows,
+                      total: 50
+                    }
+                  })
+                },
+                columns: [
                   {
-                    label: '删除',
-                    onClick() {
-                      console.log(1111)
+                    title: '名称',
+                    dataIndex: 'name',
+                    form: {
+                      key: 'name',
+                      relation: {
+                        type: 'required',
+                        key: ['asyncSelect', 'address']
+                      },
+                      rules: [ 'required']
                     }
                   },
                   {
-                    label: '编辑',
-                    onClick() {
-                      console.log(1111)
+                    title: '年龄',
+                    dataIndex: 'age',
+                    form: {
+                      key: 'asyncSelect',
+                      selectedKey: 'asyncSelectArr',
+                      type: 'asyncSelect',
+                      rules: [ 'required'],
+                      props: {
+                        params: {},
+                        multiple: true,
+                        mode: 'demo'
+                      }
                     }
+                  },
+                  {
+                    title: '地址',
+                    dataIndex: 'address',
+                    form: {
+                      key: 'address',
+                      rules: [ 'required']
+                    }
+                  },
+                  {
+                    type: 'action',
+                    actions: [
+                      {
+                        label: '删除',
+                        onClick() {
+                          console.log(1111)
+                        }
+                      },
+                      {
+                        label: '编辑',
+                        onClick() {
+                          console.log(1111)
+                        }
+                      }
+                    ]
                   }
                 ]
               }
-            ]
-          }
+            }
+          ]
         }
+        
       ]
     }
   },

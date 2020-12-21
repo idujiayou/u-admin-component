@@ -21,8 +21,8 @@
     </u-dialog>
 </template>
 <script>
-import localeUse from '@/use/locale'
-import dialogUse from '@/use/dialog'
+import localeUse from 'u-admin-component/src/use/locale'
+import dialogUse from 'u-admin-component/src/use/dialog'
 export default {
   name: 'u-form-btn',
   props: {

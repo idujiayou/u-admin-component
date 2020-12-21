@@ -36,7 +36,7 @@
       <div class="u-async-select-input" @click="stopPropagation">
         <div ref="showTags" v-if="firstTag" class="u-show-tags">
           <a-tag  visible closable @close="handleClose(0)" @click="firstTag && tagClick($event)" style="cursor: pointer;">
-            {{ firstTag[showKey] }}
+            {{ firstTag && firstTag[showKey] }}
           </a-tag>
         </div>
         <a-tag v-if="selectedRows.length > 1" @click="numClick" style="cursor: pointer;margin-right: 0;">
@@ -53,11 +53,13 @@
   </div>
 </template>
 <script>
-import uTable from '@/components/u-table/src'
-import requestUse from '@/use/request'
+import uTable from 'u-admin-component/src/components/u-table/src'
+import requestUse from 'u-admin-component/src/use/request'
 import { inject, computed } from 'vue'
-import tableUse from '@/use/table'
+import tableUse from 'u-admin-component/src/use/table'
 import { isBoolean, isArray, isEqualWith, forEach } from 'lodash';
+import uConfig from 'u-admin-component/src/config'
+
 export default {
   name: 'uAsyncSelect',
   props: {
@@ -89,7 +91,7 @@ export default {
     }
   },
   setup(props) {
-    const { asyncSelect: asyncSelectConfig } = inject('uConfig')
+    const { asyncSelect: asyncSelectConfig } = inject('uConfig') || uConfig
     const getModeConfig = function() {
       let {columns, mode} = props
           
@@ -150,7 +152,7 @@ export default {
     value: {
       handler(val) {
         if(val + '' !== this.selectedRowKeys + '') {
-          if(!val.length) {
+          if(!val || !val.length) {
             this.selectedRows = []
           }
         }

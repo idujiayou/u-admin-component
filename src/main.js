@@ -1,38 +1,18 @@
 import { createApp } from 'vue'
+import uAdmin from './index'
 import App from './App.vue'
 import router from './router'
 import store from './store'
 import Antd from 'ant-design-vue'
-import uForm from '@/components/u-form'
-import uFormItem from '@/components/u-form/form-item'
-import uDialog from '@/components/u-dialog'
-import { locale, getLanguage, getLocaleValue } from '@/lang/index'
+import { locale, getLanguage, getLocaleValue } from 'u-admin-component/src/lang/index'
 import 'default-passive-events'
-import uUpload from '@/components/u-upload'
-import uEditor from '@/components/u-editor'
-import uAsyncSelect from '@/components/u-async-select'
-import uSearchBtn from '@/components/u-search-btn'
-import uSearchBar from '@/components/u-search-bar'
-import uExportBtn from '@/components/u-export-btn'
-import uFormBtn from '@/components/u-form-btn'
-import uTable from '@/components/u-table'
 
 const app = createApp(App)
 const components = [
   Antd,
   store,
   router,
-  uUpload, 
-  uEditor, 
-  uAsyncSelect,
-  uForm,
-  uFormItem,
-  uDialog,
-  uSearchBtn,
-  uSearchBar,
-  uExportBtn,
-  uFormBtn,
-  uTable
+  uAdmin
 ]
 
 components.forEach(item => {

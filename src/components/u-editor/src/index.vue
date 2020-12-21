@@ -24,13 +24,14 @@
   </div>
 </template>
 <script>
-import localeUse from '@/use/locale'
+import localeUse from 'u-admin-component/src/use/locale'
 import { inject } from 'vue'
-import { quillEditor } from '@/components/vue-quill-editor/src'
+import { quillEditor } from 'u-admin-component/src/components/vue-quill-editor/src'
 import { message } from 'ant-design-vue'
 import 'quill/dist/quill.core.css'
 import 'quill/dist/quill.snow.css'
 import 'quill/dist/quill.bubble.css'
+import uConfig from 'u-admin-component/src/config'
 
 export default {
   name: 'uEditor',
@@ -41,7 +42,7 @@ export default {
   },
   setup() {
     const { translate } = localeUse()
-    const { upload: uploadImgConfig} = inject('uConfig')
+    const { upload: uploadImgConfig} = inject('uConfig') || uConfig
 
     return {
       translate,

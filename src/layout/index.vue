@@ -71,8 +71,6 @@ import { ref, computed } from 'vue'
 import appBody from './components/app-body'
 import appNav from './components/app-nav'
 import appTagsView from './components/app-tags-view'
-import UScreenfull from '@/components/u-screenfull'
-import UBreadcrumb from '@/components/u-breadcrumb'
 
 import {
   MenuUnfoldOutlined,
@@ -85,8 +83,6 @@ export default {
     appBody,
     appNav,
     appTagsView,
-    UScreenfull,
-    UBreadcrumb,
     MenuUnfoldOutlined,
     MenuFoldOutlined
   },

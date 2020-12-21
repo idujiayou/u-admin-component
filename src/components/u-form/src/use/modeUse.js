@@ -1,5 +1,5 @@
 import { isArray } from 'lodash'
-import { getKeys, getValueByKey } from '@/utils'
+import { getKeys, getValueByKey } from 'u-admin-component/src/utils'
 export default function() {
   const setModel = function(modelRef, key, val) {
     if(key) {

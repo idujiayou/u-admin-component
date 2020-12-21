@@ -46,12 +46,12 @@
   </div>
 </template>
 <script>
-import localeUse from '@/use/locale'
-import dialogUse from '@/use/dialog'
+import localeUse from 'u-admin-component/src/use/locale'
+import dialogUse from 'u-admin-component/src/use/dialog'
 import {
   SearchOutlined
 } from '@ant-design/icons-vue'
-import { isRequired } from '@/utils'
+import { isRequired } from 'u-admin-component/src/utils'
 import { isArray } from 'lodash'
 
 export default {
