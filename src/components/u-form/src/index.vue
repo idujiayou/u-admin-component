@@ -122,7 +122,7 @@
 </template>
 <script>
 import uRender from 'u-admin-component/src/components/u-render'
-import { merge, forIn, isFunction, isArray } from 'lodash'
+import { merge, forIn, isFunction, isArray, isString } from 'lodash'
 import rulesUse from './use/rulesUse'
 import toggleUse from './use/toggleUse'
 import uniKeyUse from './use/uniKeyUse'
@@ -138,6 +138,7 @@ import {
 } from '@ant-design/icons-vue'
 import requestUse from 'u-admin-component/src/use/request'
 import uConfig from 'u-admin-component/src/config'
+import { getAsyncSelectKey } from 'u-admin-component/src/components/u-form/src/utils'
 
 export default {
   name: 'uForm',
@@ -297,12 +298,44 @@ export default {
           if(['select'].includes(item.type)) {
             let props = item.props
             let options = props.options || []
+            let arr = value ? (isArray(value) ? value : value.split(',') ) : []
+            let valArr = []
 
-            options.forEach(v => {
-              if(value + '' === v.value + '') {
-                value = v.label
+            arr.forEach(v => {
+              let index = options.findIndex(i => i.value + '' === v + '')
+
+              if(index !== -1 && options[index]) {
+                valArr.push( isString(options[index]) ? options[index] : (options[index].label || options[index].value))
               }
             })
+
+            value = valArr
+            
+          } else if(['asyncSelect'].includes(item.type)) {
+            let selectedKey = getAsyncSelectKey(item.type, item.key, item.selectedKey)
+            let selectedVal = this.getModelRef(selectedKey, modelRef)
+            let { showKey = 'name' } = item.props || {}
+
+            if(selectedVal) {
+              value = []
+              selectedVal.forEach(obj => {
+                value.push(obj[showKey])
+              })
+            }
+          } else if(['cascader'].includes(item.type)) {
+            if(value && isArray(value)) {
+              let props = item.props
+              let options = props.options || []
+
+              if(options.length) {
+                value = this.getCascaderVal(options, value)
+              }
+              value = value.join(' / ')
+            }
+          } else if(['rangePicker'].includes(item.type)) {
+            if(value && isArray(value)) {
+              value = value.join(' - ')
+            }
           }
           temp.push({
             label: item.label,
@@ -311,6 +344,19 @@ export default {
         }
       })
       return temp
+    },
+    getCascaderVal(options, value, index = 0, arr = []) {
+      options.forEach(item => {
+        let val = value[index]
+        if(item.value + '' === val + '') {
+          arr.push(item.label)
+          if(item.children && item.children.length) {
+            this.getCascaderVal(item.children, value, index + 1, arr)
+          }
+        }
+      })
+      
+      return arr
     },
     onSubmit(e) {
       e.preventDefault()

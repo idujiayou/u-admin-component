@@ -2,15 +2,50 @@
   <div class="u-search-btn">
     
     <a-button-group>
-      <a-popover :title="translate('uSearchBtn.selectedTitle')">
+      <a-popover :title="translate('uSearchBtn.selectedTitle')" >
         <template #content>
-          <div style="max-width: 500px;">
-            <a-tag v-for="(item, index) in params" :key="index" class="ant-tag-primary" style="margin-top: 4px; margin-bottom: 4px;">
-              {{item.label}}: {{item.value + ''}}
-            </a-tag>
-            <div v-if="!params.length" style="color: #999;">
-              <SearchOutlined /> {{translate('uSearchBtn.empty')}}
-            </div>
+          <div class="u-search-popover">
+            <!-- <a-descriptions size="small" bordered layout="vertical" v-show="params.length" >
+              <a-descriptions-item
+                v-for="(item, index) in params"
+                :key="index"
+                :label="item.label">
+                {{item.value + ''}}
+              </a-descriptions-item>
+  
+            </a-descriptions> -->
+            <template 
+              v-for="(item, index) in params" 
+              :key="index" >
+              <div v-if="isArray(item.value) && item.value.length > 1" style="margin-bottom: 10px;">
+                <div :style="item.value.length < 4 ? 'display: inline-block' : ''">
+                  {{item.label}}：
+                </div>
+                <a-tag 
+                  v-for="(val, index2) in item.value" 
+                  :key="index2"
+                  class="ant-tag-primary" 
+                  style="margin-top: 4px; margin-bottom: 4px;">
+                  {{ val }}
+                </a-tag>
+
+              </div>
+              <div v-else style="margin-right: 20px; display: inline-block; margin-bottom: 10px;">
+                {{item.label}}：
+                <a-tag 
+                  class="ant-tag-primary" 
+                  style="margin-top: 4px; margin-bottom: 4px;">
+                  {{item.value + ''}}
+                </a-tag>
+              </div>
+            </template>
+            
+            <a-empty 
+              v-show="!params.length" 
+              :image-style="{
+                height: '60px'
+              }"
+              :description="translate('uSearchBtn.empty')" />
           </div>
         </template>
         <a-button @click="toggle('visible')">
@@ -77,6 +112,7 @@ export default {
     }
   },
   methods: {
+    isArray,
     isType(type, item) {
       let arr = isArray(type) ? type : [type]
       return arr.includes(item.type)

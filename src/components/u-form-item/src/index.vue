@@ -62,7 +62,7 @@
       v-else-if="isType('cascader')" 
       v-bind="itemProps"
       :value="model" 
-      @change="inputChange($event)" 
+      @change="cascaderChange" 
     />
     <a-checkbox 
       v-else-if="isType('checkbox')"
@@ -394,6 +394,9 @@ export default {
     checkboxChange(evt) {
       let val = evt && evt.target ? evt.target.checked : evt
       this.inputChange(val ? '1' : '0')
+    },
+    cascaderChange(evt) {
+      this.inputChange(evt)
     },
     inputChange(evt, k0, defaultVal) {
       let {key, modelRef, item} = this
